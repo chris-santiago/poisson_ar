@@ -10,14 +10,7 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
     """Estimator for Generalized Poisson model with autoregressive residuals."""
     def __init__(self, lags=1):
         """Constructor"""
-        self.X_ = None
-        self.y_ = None
-        self.lags_ = lags
-        self.intercept_ = None
-        self.coef_ = None
-        self.alpha_ = None
-        self._poisson_fit = None
-        self._autoreg_fit = None
+        self.lags = lags
 
     def _fit_poisson(self, X, y):
         """Fit a Poisson model."""
@@ -30,7 +23,7 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
 
     def _fit_autoreg(self, endog):
         """Fit an AR model."""
-        mod = AutoReg(endog, self.lags_)
+        mod = AutoReg(endog, self.lags)
         self._autoreg_fit = mod.fit()
 
     def fit(self, X, y):
@@ -38,7 +31,6 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
         X, y = check_X_y(X, y)
         self.X_ = X
         self.y_ = y
-
         self._fit_poisson(add_constant(X), y)
         self._fit_autoreg(self._poisson_fit.resid)
         return self
