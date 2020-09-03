@@ -15,8 +15,8 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
     def _fit_poisson(self, X, y):
         """Fit a Poisson model."""
         mod = GeneralizedPoisson(endog=y, exog=X)
-        self._poisson_fit = mod.fit()
-        params = self._poisson_fit.params
+        self.poisson_fit_ = mod.fit()
+        params = self.poisson_fit_.params
         self.intercept_ = params[0]
         self.alpha_ = params[-1]
         self.coef_ = params[1:-1]
@@ -24,7 +24,7 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
     def _fit_autoreg(self, endog):
         """Fit an AR model."""
         mod = AutoReg(endog, self.lags)
-        self._autoreg_fit = mod.fit()
+        self.autoreg_fit_ = mod.fit()
 
     def fit(self, X, y):
         """Fit the estimator."""
@@ -32,11 +32,11 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
         self.X_ = X
         self.y_ = y
         self._fit_poisson(add_constant(X), y)
-        self._fit_autoreg(self._poisson_fit.resid)
+        self._fit_autoreg(self.poisson_fit_.resid)
         return self
 
     def predict(self, X):
         """Predict the response."""
         check_is_fitted(self)
         X = check_array(X)
-        return self._poisson_fit.predict(add_constant(X)) + self._autoreg_fit.forecast(len(X))
+        return self.poisson_fit_.predict(add_constant(X)) + self.autoreg_fit_.forecast(len(X))
