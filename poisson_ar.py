@@ -50,6 +50,4 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
         check_is_fitted(self)
         X = add_constant(X)
         X = check_array(X)
-        poisson_pred = self._poisson_fit.predict(X)
-        autoreg_pred = self._autoreg_fit.forecast(len(X))
-        return poisson_pred + autoreg_pred
+        return self._poisson_fit.predict(X) + self._autoreg_fit.forecast(len(X))
