@@ -35,19 +35,16 @@ class PoissonTimeSeries(BaseEstimator, RegressorMixin):
 
     def fit(self, X, y):
         """Fit the estimator."""
-        X = add_constant(X)
         X, y = check_X_y(X, y)
         self.X_ = X
         self.y_ = y
 
-        self._fit_poisson(X, y)
-        poisson_resid = self._poisson_fit.resid
-        self._fit_autoreg(poisson_resid)
+        self._fit_poisson(add_constant(X), y)
+        self._fit_autoreg(self._poisson_fit.resid)
         return self
 
     def predict(self, X):
         """Predict the response."""
         check_is_fitted(self)
-        X = add_constant(X)
         X = check_array(X)
-        return self._poisson_fit.predict(X) + self._autoreg_fit.forecast(len(X))
+        return self._poisson_fit.predict(add_constant(X)) + self._autoreg_fit.forecast(len(X))
